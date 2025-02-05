@@ -30,7 +30,10 @@ const WheatCalculator = () => {
   const [foodYumeResult, setFoodYumeResult] = useState(null);
   const [foodNanatsuResult, setFoodNanatsuResult] = useState(null);
   const [totalNanatsuSacks, setTotalNanatsuSacks] = useState(0);
-
+  const [processingRiceArea, setProcessingRiceArea] = useState('');
+  const [processingRiceYield, setProcessingRiceYield] = useState('');
+  const [isRenovation1, setIsRenovation1] = useState(false);
+  const [processingRiceResult, setProcessingRiceResult] = useState(null);
 
   const calculateSpring = () => {
     const areaValue = parseFloat(springArea);
@@ -165,6 +168,21 @@ const WheatCalculator = () => {
     const profit = totalRevenue - cost;
 
     setFoodNanatsuResult({ totalSacks, totalRevenue, cost, profit });
+  };
+
+  const calculateProcessingRice = () => {
+    const areaValue = parseFloat(processingRiceArea);
+    const yieldValue = parseFloat(processingRiceYield);
+    if (isNaN(areaValue) || isNaN(yieldValue)) return;
+
+    const cost = Math.floor((areaValue / 10) * 30323);
+    const farmlandUtilization = Math.floor((areaValue / 10) * (isRenovation1 ? 30000 : 20000));
+    const regionalGrant = Math.floor((areaValue / 10) * 18000);
+    const revenue = Math.floor((yieldValue * 10500) * (areaValue / 10));
+    const totalIncome = farmlandUtilization + regionalGrant + revenue;
+    const profit = totalIncome - cost;
+
+    setProcessingRiceResult({ farmlandUtilization, regionalGrant, revenue, totalIncome, cost, profit });
   };
 
   return (
@@ -351,37 +369,10 @@ const WheatCalculator = () => {
           </div>
         )}
       </div>
-      {/* <div>
-        <h2>食用米（ななつぼし）収益計算</h2>
-        <label>
-          面積 (a):
-          <input type="number" value={foodNanatsuArea} onChange={(e) => setFoodNanatsuArea(e.target.value)} />
-        </label>
-        <br />
-        <label>
-          収穫量 (俵):
-          <input type="number" value={foodNanatsuYield} onChange={(e) => setFoodNanatsuYield(e.target.value)} />
-        </label>
-       
-        <br />
-       
-        <br />
-        <br />
-        <button onClick={() => calculateFoodRice(foodNanatsuArea, foodNanatsuYield, foodNanatsuToDealer, foodNanatsuToMeijiya, setFoodNanatsuResult)}>計算</button>
-        {foodNanatsuResult && (
-          <div>
-            <h3 style={{ color: 'red' }}>結果</h3>
-            <p>業者販売収入: {foodNanatsuResult.dealerRevenue.toLocaleString()} 円</p>
-            <p>明治屋販売収入: {foodNanatsuResult.meijiyaRevenue.toLocaleString()} 円</p>
-            <p style={{ color: 'red' }}>合計販売収入: {foodNanatsuResult.totalRevenue.toLocaleString()} 円</p>
-            <p>経費: {foodNanatsuResult.cost.toLocaleString()} 円</p>
-            <h4>最終利益: {foodNanatsuResult.profit.toLocaleString()} 円</h4>
-          </div>
-        )}
-      </div> */}
+      
       <div style={{ fontSize: '20px', padding: '20px', display: 'flex', justifyContent: 'space-around' }}>
       <div>
-        <h2 style={{ color: 'red' }}>食用米（ななつぼし）収益計算</h2>
+        <h2>食用米（ななつぼし）収益計算</h2>
         <label>
           面積 (a):
           <input type="number" value={foodNanatsuArea} onChange={(e) => setFoodNanatsuArea(e.target.value)} />
@@ -399,6 +390,39 @@ const WheatCalculator = () => {
             <p>合計販売収入: {foodNanatsuResult.totalRevenue.toLocaleString()} 円</p>
             <p>経費: {foodNanatsuResult.cost.toLocaleString()} 円</p>
             <h4>最終利益: {foodNanatsuResult.profit.toLocaleString()} 円</h4>
+          </div>
+        )}
+      </div>
+    </div>
+
+    <div style={{ fontSize: '20px', padding: '20px', display: 'flex', justifyContent: 'space-around' }}>
+      <div>
+        <h2 style={{ color: 'red' }}>加工米収益計算</h2>
+        <label>
+          面積 (a):
+          <input type="number" value={processingRiceArea} onChange={(e) => setProcessingRiceArea(e.target.value)} />
+        </label>
+        <br />
+        <label>
+          収穫量 (俵):
+          <input type="number" value={processingRiceYield} onChange={(e) => setProcessingRiceYield(e.target.value)} />
+        </label>
+        <br />
+        <label>
+          リノベーション採択:
+          <input type="checkbox" checked={isRenovation1} onChange={() => setIsRenovation1(!isRenovation1)} />
+        </label>
+        <br />
+        <button onClick={calculateProcessingRice}>計算</button>
+        {processingRiceResult && (
+          <div>
+            <h3 style={{ color: 'red' }}>結果</h3>
+            <p>水田活用収入: {processingRiceResult.farmlandUtilization.toLocaleString()} 円</p>
+            <p>産地交付金: {processingRiceResult.regionalGrant.toLocaleString()} 円</p>
+            <p>販売収入: {processingRiceResult.revenue.toLocaleString()} 円</p>
+            <p>経費: {processingRiceResult.cost.toLocaleString()} 円</p>
+            <h4>合計収入: {processingRiceResult.totalIncome.toLocaleString()} 円</h4>
+            <h4>最終利益: {processingRiceResult.profit.toLocaleString()} 円</h4>
           </div>
         )}
       </div>
